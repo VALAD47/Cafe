@@ -1,0 +1,1 @@
+target_sources(cafe-cli PRIVATE src/main.cpp)
