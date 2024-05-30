@@ -109,7 +109,7 @@ int main(int argc, char** argv){
                 mvwscanw(main.get_window(), 4, 3, "%d", &count);
             }
             noecho();
-
+            main.clear_opt();
             main.print({"Ваш вибір:",2,3});
             mvwprintw(main.get_window(), 4, 3, "Категорія: %s", categories[0][category].str);
             mvwprintw(main.get_window(), 5, 3, "Страва: %s", categories[category+1][choice].str);
