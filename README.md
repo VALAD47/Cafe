@@ -3,7 +3,7 @@ It's a simple project for college homework made with C++ language and `ncurses` 
 # Build
 For building you need any C++ compiler, `ncurses` library and `cmake`
 
-To install all requirements in Arch Linux simply use one command:
+To install all requirements on Arch Linux simply use one command:
 ```sh
 sudo pacman -S ncurses cmake
 ```
