@@ -1,103 +1,136 @@
-#include <ncurses.h>
+//Made by VALAD47
+#include "window.h"
+#include <locale>
 
-#define wprint(win, text) (mvwprintw(win, text.y, text.x, text.str))
+int main(int argc, char** argv){
+    setlocale(LC_ALL, "");
 
-struct Text{
-    const char* str;
-    int y = 0, x = 0;
-    bool selectable = false;
-};
-
-class Window
-{
-private:
-    WINDOW* win;
-    Text selectables[32];
-    int opt = 0, selected = 0;
-
-    void highlight(short color_pair, Text text){
-        wattron(win, COLOR_PAIR(color_pair));
-        wprint(win, text);
-        wattroff(win, COLOR_PAIR(color_pair));
-    }
-
-public:
-    Window(int heigh, int width){
-        int x, y;
-        getmaxyx(stdscr, y, x);
-        win = newwin(heigh, width, (y/2)-(heigh/2), (x/2)-(width/2));
-        box(win, 0, 0);
-    }
-    ~Window(){
-
-    }
-
-    void refresh(){
-        wrefresh(win);
-    }
-
-    void add_opt(Text text){
-        selectables[opt] = text;
-        opt++;
-        print(text);
-        if(opt-1==0) highlight(1, text);
-    }
-
-    void print(Text text){
-        wprint(win, text);
-    }
-
-    void select(int option){
-        switch (option){
-        case 1:
-            if(selected==0) return;
-            selected--;
-            highlight(1, selectables[selected]);
-            print(selectables[selected+1]);
-
-            break;
-        case 0:
-            if(opt-1==selected) return;
-            selected++;
-            highlight(1, selectables[selected]);
-            print(selectables[selected-1]);
-
-            break;
-        default:
-            break;
-        }
-        mvprintw(0,0,"Options: %d\tSelected: %d", opt, selected);
-        refresh();
-    }
-};
-
-int main(int argc,char** argv){
     initscr();
     start_color();
 
     init_pair(1, COLOR_WHITE, COLOR_CYAN);
-    Window main(26, 36);
+    Window main(26, 40);
     refresh();
-    main.add_opt({"My first text!", 2, 3});
-    main.add_opt({"My second text!", 3, 3});
-    main.add_opt({"My second text!", 4, 3});
+
+    Text categories[][4] = {
+        {   //Категорії
+            {"1. Сніданок", 2, 3},
+            {"2. Обід", 3, 3},
+            {"3. Вечеря", 4, 3},
+            {"4. Напої", 5, 3}
+        },
+        
+        {   //Сніданок
+            {"1. Смажені яйця", 2, 3},
+            {"2. Бутерброди з ковбасою та сиром", 3, 3},
+            {"3. Панкейки", 4, 3},
+        },
+        
+        {   //Обід
+            {"1. Борщ",2,3},
+            {"2. Суп гороховий",3,3},
+            {"3. Солянка",4,3}
+        },
+
+        {   //Вечеря
+            {"1. Топчена картопля",2,3},
+            {"2. Смажена картопля",3,3},
+            {"3. Тушена картопля",4,3}
+        },
+
+        {   //Напої
+            {"1. Кола",2,3},
+            {"2. Вода",3,3},
+            {"3. Горілка",4,3}
+        }    
+    };
+
+    main.add_opt(categories[0], 4);
     main.refresh();
+    noecho();
     keypad(stdscr, true);
+
+    bool selected = false,
+         reset    = false;
+    int category  = -1,
+        choice    = -1,
+        count     = -1;
+
     while (true)
     {
+        move(0,0);
         int i = getch();
         switch (i)
         {
         case KEY_DOWN:
+        case KEY_RIGHT:
             main.select(0);
             break;
+
         case KEY_UP:
+        case KEY_LEFT:
             main.select(1);
             break;
-        default:
+
+        case KEY_ENTER:
+        case 10:{       //KEY_ENTER
+            int i = main.get_selected();
+            main.clear_opt();
+
+            if(reset){
+                if(i = 0){
+                    category = -1;
+                    choice = -1;
+                    count = -1;
+                    selected = false;
+                    reset = false;
+                    main.add_opt(categories[0], 4);
+                    main.refresh();
+                    break;
+                }
+                endwin();
+                return 0;
+            }
+
+            if(!selected){
+                selected = true;
+                category = i;
+                main.add_opt(categories[i+1], 3);
+                break;
+            }
+            
+            choice = i;
+
+            echo();
+            while(count<=0){
+                main.clear_opt();
+                main.print({"Введіть кількість порцій: ", 2, 3});
+                main.refresh();
+                mvwscanw(main.get_window(), 4, 3, "%d", &count);
+            }
+            noecho();
+
+            main.print({"Ваш вибір:",2,3});
+            mvwprintw(main.get_window(), 4, 3, "Категорія: %s", categories[0][category].str);
+            mvwprintw(main.get_window(), 5, 3, "Страва: %s", categories[category][choice].str);
+            mvwprintw(main.get_window(), 6, 3, "Кількість порцій: %d", count);
+
+            Text yn[] = {{"Так", 12, 5}, {"Ні", 12, 15}};
+            main.print({"Бажаєте зробити ще одне замовлення?", 10, 3});
+            main.add_opt(yn, 2);
+            break;
+        }
+
+        case 'q':
+        case 27:        //KEY_ESC
             endwin();
             return 0;
             break;
+
+        default:
+            break;
         }
+
+        main.refresh();
     }
 }
