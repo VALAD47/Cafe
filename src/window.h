@@ -1,13 +1,22 @@
 //Made by VALAD47
 #pragma once
+
+#ifdef _WIN32
+
+#include <ncursesw/ncurses.h>
+
+#else
+
 #include <ncurses.h>
 
-#define wprint(win, text) (mvwprintw(win, text.y, text.x, text.str))
+#endif
 
 struct Text{
     const char* str;
     int y = 0, x = 0;
 };
+
+#define wprint(win, text) (mvwprintw(win, text.y, text.x, text.str))
 
 class Window
 {
