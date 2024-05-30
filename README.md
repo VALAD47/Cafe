@@ -1,5 +1,6 @@
 # About
-It's a simple project for college homework made with C++ language and `ncurses` library
+It's a simple project for college homework made with C++ language and `ncurses` library.
+ [Video of how it's working](https://streamable.com/37qakl)
 # Build
 For building you need any C++ compiler, `ncurses` library and `cmake`
 
