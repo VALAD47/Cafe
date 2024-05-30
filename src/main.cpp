@@ -8,7 +8,7 @@ int main(int argc, char** argv){
     initscr();
     start_color();
 
-    init_pair(1, COLOR_WHITE, COLOR_CYAN);
+    init_pair(1, COLOR_WHITE, COLOR_BLUE);
     Window main(26, 40);
     refresh();
 
@@ -78,7 +78,7 @@ int main(int argc, char** argv){
             main.clear_opt();
 
             if(reset){
-                if(i = 0){
+                if(i == 0){
                     category = -1;
                     choice = -1;
                     count = -1;
@@ -112,12 +112,13 @@ int main(int argc, char** argv){
 
             main.print({"Ваш вибір:",2,3});
             mvwprintw(main.get_window(), 4, 3, "Категорія: %s", categories[0][category].str);
-            mvwprintw(main.get_window(), 5, 3, "Страва: %s", categories[category][choice].str);
+            mvwprintw(main.get_window(), 5, 3, "Страва: %s", categories[category+1][choice].str);
             mvwprintw(main.get_window(), 6, 3, "Кількість порцій: %d", count);
 
             Text yn[] = {{"Так", 12, 5}, {"Ні", 12, 15}};
             main.print({"Бажаєте зробити ще одне замовлення?", 10, 3});
             main.add_opt(yn, 2);
+            reset = true;
             break;
         }
 
